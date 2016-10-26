@@ -27,13 +27,22 @@
             @Html.DisplayFor(model => model.ActivityDate)
         </dd>
 
-        <dt>
+        @*<dt>
             @Html.DisplayNameFor(model => model.ActivityTitle)
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.ActivityTitle)
+        </dd>*@
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TripLeader.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TripLeader.LastName)
         </dd>
+
 
         <dt>
             @Html.DisplayNameFor(model => model.ActivityParticipants)

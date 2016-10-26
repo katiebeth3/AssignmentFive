@@ -19,7 +19,7 @@ namespace AssignmentFive.Models
         [StringLength(50)]
         public String FirstName { get; set; }
 
-        [Display(Name = "Full Name")]
+        [Display(Name = "Trip Leader")]
         public String FullName
         {
             get

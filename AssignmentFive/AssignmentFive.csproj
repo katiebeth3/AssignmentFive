@@ -184,6 +184,10 @@
     <Compile Include="Migrations\201610250729200_addTripLeader.Designer.cs">
       <DependentUpon>201610250729200_addTripLeader.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610260110417_addEditTripLeader.cs" />
+    <Compile Include="Migrations\201610260110417_addEditTripLeader.Designer.cs">
+      <DependentUpon>201610260110417_addEditTripLeader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Activity.cs" />
@@ -271,6 +275,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610250729200_addTripLeader.resx">
       <DependentUpon>201610250729200_addTripLeader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610260110417_addEditTripLeader.resx">
+      <DependentUpon>201610260110417_addEditTripLeader.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

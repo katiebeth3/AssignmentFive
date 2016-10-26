@@ -104,7 +104,7 @@ namespace AssignmentFive.Migrations
                     ActivityText = "Almost 3 hours of climbing in this 60-mile round trip ride."
                 }
                };
-            activities.ForEach(s => context.Activities.AddOrUpdate(p => p.ActivityName, s));
+            activities.ForEach(s => context.Activities.AddOrUpdate(p => p.ID, s));
             context.SaveChanges();
             //              );
         }

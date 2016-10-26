@@ -16,8 +16,16 @@ namespace AssignmentFive.Migrations
                         FirstName = c.String(nullable: false, maxLength: 50),
                     })
                 .PrimaryKey(t => t.TripLeaderID);
-            
-            AddColumn("dbo.Activity", "TripLeaderID", c => c.Int(nullable: false));
+
+            //ADDED THESE
+            // Create a department for course to point to.
+            Sql("INSERT INTO dbo.TripLeader (FirstName, LastName) VALUES ('Temp','Temp')");//this line cannot wrap
+            // default value for FK points to department created above.
+            //populate department table manually
+            AddColumn("dbo.Activity", "TripLeaderID", c => c.Int(nullable: false, defaultValue: 1));
+
+
+           // AddColumn("dbo.Activity", "TripLeaderID", c => c.Int(nullable: false));
             CreateIndex("dbo.Activity", "TripLeaderID");
             AddForeignKey("dbo.Activity", "TripLeaderID", "dbo.TripLeader", "TripLeaderID", cascadeDelete: true);
         }

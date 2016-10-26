@@ -1,6 +1,10 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using AssignmentFive.Models;
 using System.Collections.Generic;
@@ -15,27 +19,29 @@ namespace AssignmentFive.Controllers
         // GET: Activities
         public ActionResult Index(string activityCategory, string searchString)
         {
+            var activities = db.Activities.Include(c => c.TripLeader);
+            return View(activities.ToList());
 
-            var ActivityLst = new List<string>();
+            //var ActivityLst = new List<string>();
 
-            var ActivityQry = from d in db.Activities
-                              orderby d.ActivityCategory
-                              select d.ActivityCategory;
-            ActivityLst.AddRange(ActivityQry.Distinct());
-            ViewBag.activityCategory = new SelectList(ActivityLst);
+            //var ActivityQry = from d in db.Activities
+            //                  orderby d.ActivityCategory
+            //                  select d.ActivityCategory;
+            //ActivityLst.AddRange(ActivityQry.Distinct());
+            //ViewBag.activityCategory = new SelectList(ActivityLst);
 
 
-            var activities = from m in db.Activities //this is like select * from  movies
-                             select m;
+            //var activities = from m in db.Activities //this is like select * from  movies
+            //                 select m;
 
-            if (!string.IsNullOrEmpty(searchString))
-                activities = activities.Where(s => s.ActivityTitle.Contains(searchString));
+            //if (!string.IsNullOrEmpty(searchString))
+            //    activities = activities.Where(s => s.ActivityTitle.Contains(searchString));
 
-            if (!string.IsNullOrEmpty(activityCategory))
-            {
-                activities = activities.Where(x => x.ActivityCategory == activityCategory);
-            }
-            return View(activities);
+            //if (!string.IsNullOrEmpty(activityCategory))
+            //{
+            //    activities = activities.Where(x => x.ActivityCategory == activityCategory);
+            //}
+            //return View(activities);
         }
         // GET: Activities/Details/5
         public ActionResult Details(int? id)
@@ -55,6 +61,7 @@ namespace AssignmentFive.Controllers
         // GET: Activities/Create
         public ActionResult Create()
         {
+            PopulateTripLeadersDropDownList();
             return View();
         }
 
@@ -63,15 +70,22 @@ namespace AssignmentFive.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,ActivityName,ActivityDate,ActivityTitle,ActivityParticipants,ActivityCategory,ActivityDescription,ActivityLengthHours,ActivityText")] Activity activity)
+        public ActionResult Create([Bind(Include = "ID,ActivityName,ActivityDate,TripLeaderID,ActivityParticipants,ActivityCategory,ActivityDescription,ActivityLengthHours,ActivityText")] Activity activity)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Activities.Add(activity);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Activities.Add(activity);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
-
+            catch (RetryLimitExceededException /* dex */)
+            { //Log the error (uncomment dex variable name and add a line here to write a log.) 
+                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+            }
+            PopulateTripLeadersDropDownList(activity.TripLeaderID);
             return View(activity);
         }
 
@@ -87,6 +101,7 @@ namespace AssignmentFive.Controllers
             {
                 return HttpNotFound();
             }
+            PopulateTripLeadersDropDownList(activity.TripLeaderID);
             return View(activity);
         }
 
@@ -95,16 +110,35 @@ namespace AssignmentFive.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,ActivityName,ActivityDate,ActivityTitle,ActivityParticipants,ActivityCategory,ActivityDescription,ActivityLengthHours,ActivityText")] Activity activity)
+        //public ActionResult Edit([Bind(Include = "ID,ActivityName,ActivityDate,ActivityTitle,TripLeaderID,ActivityParticipants,ActivityCategory,ActivityDescription,ActivityLengthHours,ActivityText")] Activity activity)
+        public ActionResult Edit([Bind(Include = "ID,ActivityName,ActivityDate,TripLeaderID,ActivityParticipants,ActivityCategory,ActivityDescription,ActivityLengthHours,ActivityText")] Activity activity)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Entry(activity).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Entry(activity).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
+            catch (RetryLimitExceededException /* dex */)
+            {
+                //Log the error (uncomment dex variable name and add a line here to write a log.) 
+                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+            }
+            PopulateTripLeadersDropDownList(activity.TripLeaderID);
             return View(activity);
         }
+
+        private void PopulateTripLeadersDropDownList(object selectedTripLeader = null)
+        {
+            var tripleadersQuery = from d in db.TripLeaders
+                                   orderby d.LastName
+                                   select d;
+            ViewBag.TripLeaderID = new SelectList(tripleadersQuery, "TripLeaderID", "LastName", selectedTripLeader);
+        }
+
 
         // GET: Activities/Delete/5
         public ActionResult Delete(int? id)
