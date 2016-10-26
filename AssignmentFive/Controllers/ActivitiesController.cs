@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PagedList;
+using System;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -17,32 +18,47 @@ namespace AssignmentFive.Controllers
         private ActivityDBContext db = new ActivityDBContext();
 
         // GET: Activities
-        public ActionResult Index(string activityCategory, string searchString)
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
-            var activities = db.Activities.Include(c => c.TripLeader);
-            return View(activities.ToList());
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewBag.CurrentFilter = searchString;
+            var activities = from s in db.Activities
+                           select s;
+            if (!String.IsNullOrEmpty(searchString))
+            { activities = activities.Where(s => s.ActivityName.ToUpper().Contains(searchString.ToUpper()) || s.ActivityCategory.ToUpper().Contains(searchString.ToUpper())); }
 
-            //var ActivityLst = new List<string>();
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    activities = activities.OrderByDescending(s => s.ActivityName);
+                    break;
+                case "Date":
+                    activities = activities.OrderBy(s => s.ActivityDate);
+                    break;
+                case "date_desc":
+                    activities = activities.OrderByDescending(s => s.ActivityDate);
+                    break;
+                default:
+                    activities = activities.OrderBy(s => s.ActivityName);
+                    break;
 
-            //var ActivityQry = from d in db.Activities
-            //                  orderby d.ActivityCategory
-            //                  select d.ActivityCategory;
-            //ActivityLst.AddRange(ActivityQry.Distinct());
-            //ViewBag.activityCategory = new SelectList(ActivityLst);
+            }
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            return View(activities.ToPagedList(pageNumber, pageSize));
 
 
-            //var activities = from m in db.Activities //this is like select * from  movies
-            //                 select m;
-
-            //if (!string.IsNullOrEmpty(searchString))
-            //    activities = activities.Where(s => s.ActivityTitle.Contains(searchString));
-
-            //if (!string.IsNullOrEmpty(activityCategory))
-            //{
-            //    activities = activities.Where(x => x.ActivityCategory == activityCategory);
-            //}
-            //return View(activities);
         }
+        
         // GET: Activities/Details/5
         public ActionResult Details(int? id)
         {

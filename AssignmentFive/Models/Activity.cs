@@ -12,9 +12,11 @@ namespace AssignmentFive.Models
     {
         public int ID { get; set; }
 
+        [Required]//this is only for the view (not for the db)
         [Display(Name = "Activity Name")]
         public String ActivityName { get; set; }
 
+        [Required]//this is only for the view (not for the db)
         [Display(Name = "Activity Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MM-dd-yyyy}", ApplyFormatInEditMode = true)]
@@ -24,18 +26,21 @@ namespace AssignmentFive.Models
         [Display(Name = "Title")]
         public String ActivityTitle { get; set; }
 
-        [Display(Name = "Trip Leader ID")]
+        [Required]//this is only for the view (not for the db)
+        [Display(Name = "Trip Leader")]
         public int TripLeaderID { get; set; }
 
         [Display(Name = "Participants")]
         public String ActivityParticipants { get; set; }
 
+        [Required]//this is only for the view (not for the db)
         [Display(Name = "Category")]
         public String ActivityCategory { get; set; }
 
         [Display(Name = "Description")]
         public String ActivityDescription { get; set; }
 
+        [Required]//this is only for the view (not for the db)
         [Display(Name = "Length in Hours")]
         public decimal ActivityLengthHours { get; set; }
 
